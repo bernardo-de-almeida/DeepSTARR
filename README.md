@@ -5,7 +5,7 @@ For more information, see the DeepSTARR manuscript:
 *DeepSTARR predicts enhancer activity from DNA sequence and enables the de novo design of enhancers* bioRxiv (2021)
 
 This repository contains the code used to process genome-wide and oligo UMI-STARR-seq and train DeepSTARR.
-The raw sequencing data are available from GEO under accession number GSE183939.
+The raw sequencing data are available from GEO under accession number [GSE183939](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE183939).
 
 ## Genome-wide enhancer activity maps of developmental and housekeeping enhancers
 We used UMI-STARR-seq ([Arnold et al., 2013](http://www.sciencemag.org/lookup/doi/10.1126/science.1232542); [Neumayr et al., 2019](https://doi.org/10.1002/cpmb.105)) to generate genome-wide high resolution, quantitative activity maps of developmental and housekeeping enhancers, representing the two main transcriptional programs in *Drosophila* S2 cells ([Arnold et al., 2017](http://dx.doi.org/doi:10.1038/nbt.3739); [Haberle et al., 2019](https://doi.org/10.1038/s41586-019-1210-7); [Zabidi et al., 2015](http://dx.doi.org/10.1038/nature13994)).
