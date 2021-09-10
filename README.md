@@ -12,7 +12,7 @@ We used UMI-STARR-seq ([Arnold et al., 2013](http://www.sciencemag.org/lookup/do
 
 <img src="img/gw_UMISTARRseq.png" width="700" style="margin-bottom:0;margin-top:0;"/>
 
-You can find the code to process the data [here](GenomeWide_UMISTARRseq)
+You can find the code to process the data [here](GenomeWide_UMISTARRseq).
 
 ## DeepSTARR model
 
@@ -22,7 +22,7 @@ You can find the code to process the data [here](GenomeWide_UMISTARRseq)
     <img height="200" src="img/DeepSTARR_predictions.png">
 </p>
 
-You can find the code [here](DeepSTARR)
+You can find the code [here](DeepSTARR).
 
 ### Predict developmental and housekeeping activity of new DNA sequences
 
@@ -30,7 +30,7 @@ You can find the code [here](DeepSTARR)
 
 ## UMI-STARR-seq with designed oligo libraries to test more than 40,000 wildtype and mutant Drosophila and human enhancers
 
-You can find the code [here](Oligo_UMISTARRseq)
+You can find the code [here](Oligo_UMISTARRseq).
 
 
 
@@ -39,4 +39,4 @@ You can find the code [here](Oligo_UMISTARRseq)
 Genome browser tracks showing genome-wide UMI-STARR-seq and DeepSTARR predictions in Drosophila, together with the enhancers used for mutagenesis, mutated motif instances and respective log2 fold-changes, are available at https://genome.ucsc.edu/s/bernardo.almeida/DeepSTARR_manuscript.
 
 ## Questions
-If you have any questions/requests/comments please contact me at [bernardo.almeida94@gmail.com](mailto:bernardo.almeida94@gmail.com)
+If you have any questions/requests/comments please contact me at [bernardo.almeida94@gmail.com](mailto:bernardo.almeida94@gmail.com).
