@@ -1,0 +1,386 @@
+---
+title: "Drosophila oligo library processing"
+author: "Bernardo Almeida"
+output: html_document
+---
+
+```{r set working directory}
+
+setwd("Oligo_UMISTARRseq")
+
+library(BSgenome.Dmelanogaster.UCSC.dm3)
+library(GenomicRanges)
+library(rtracklayer)
+library(dplyr)
+library(patchwork)
+library(ggplot2)
+
+library(ggseqlogo)
+library(cowplot)
+library(TFBSTools)
+library(ggpointdensity)
+
+```
+
+# Load sequencing data and process the data
+
+```{r Load oligo info and experiment tables}
+
+Oligo_library_metadata <- read.delim("Drosophila_oligo_library_oligo_info.txt")
+
+# experiment tables
+experiment_table <- read.delim("Drosophila_oligo_library_experiment.txt")
+
+```
+
+```{r load UMI STARR-seq and input reads}
+
+for(i in experiment_table$simple_name){
+  possible_types <- c("UMI", "all")
+  
+  for(type in possible_types){
+    
+    path <- experiment_table$Outpath[experiment_table$simple_name == i]
+    mapped <- import.bed(paste0(path, "/", experiment_table$Outfile[experiment_table$simple_name %in% i], ".", type, ".bed"))
+    
+    # choose sequences with correct length
+    mapped_correct_length <- mapped[width(mapped)==249 & mapped@strand %in% "+"]
+    
+    # add counts info to Oligo_library_metadata table
+    Oligo_library_metadata <- merge(Oligo_library_metadata, as.data.frame(table(mapped_correct_length@seqnames)), by=1, all.x=T)
+    names(Oligo_library_metadata)[ncol(Oligo_library_metadata)] <- paste0(i, "_", type)
+    
+    print(paste0(i, "_", type))
+    
+  }
+}
+
+# correct NAs to 0 counts
+Oligo_library_metadata[14:ncol(Oligo_library_metadata)][is.na(Oligo_library_metadata[14:ncol(Oligo_library_metadata)])] <- 0
+
+write.table(Oligo_library_metadata, paste0("Drosophila_oligo_library_Oligo_counts.txt"), sep="\t", quote=F, row.names = F)
+
+```
+
+### Input quality
+
+```{r plot distribution of sequences}
+
+Oligo_library_metadata <- read.delim("Drosophila_oligo_library_Oligo_counts.txt")
+
+pdf("Drosophila_oligo_library_Distribution.of.fragment.counts.pdf", width = 7, height = 4.5)
+
+for(i in names(Oligo_library_metadata)[14:ncol(Oligo_library_metadata)]){
+  
+  nr.reads.per.variant <- Oligo_library_metadata[[i]]
+  
+  expected_total_oligos=nrow(Oligo_library_metadata)
+  
+  if(length(grep("STARR", i))==0) position="topleft"
+  if(length(grep("STARR", i))>0) position="topright"
+  
+  plot(density(log10(nr.reads.per.variant)), xlab = "log10 counts of sequenced oligos",
+       main = gsub("_", " ", i))
+  legend("topleft", legend = c(paste0("Nr of perfect reads mapped = ", round(sum(Oligo_library_metadata[[i]])/1e6,1), " M"),
+                                paste0("Nr oligos detected = ", length(Oligo_library_metadata[[i]][!Oligo_library_metadata[[i]]==0]), " (", formatC(length(Oligo_library_metadata[[i]][!Oligo_library_metadata[[i]]==0])/expected_total_oligos*100, format = "f", digits = 2), "%)"),
+                                paste0("Mean = ", round(mean(nr.reads.per.variant))),
+                                paste0("Median = ", median(nr.reads.per.variant))),
+         text.col = c("black", "black", "tomato3", "steelblue3"), bty = "n",
+         cex=0.85)
+  abline(v = c(log10(median(nr.reads.per.variant)), log10(mean(nr.reads.per.variant))), col = c("steelblue3", "tomato3"), lwd = 1)
+  
+  # make main plot for inputs to compare the different libraries
+  if(length(grep("input", i))>0){
+    gg <- ggplot() +
+      geom_density(data=Oligo_library_metadata,
+                   aes(x=Oligo_library_metadata[[i]]),
+                   fill="grey60") +
+      geom_density(data=Oligo_library_metadata,
+                   aes(x=Oligo_library_metadata[[i]],
+                       fill = Experiment %in% "wt"), alpha = 0.3) +
+      scale_fill_brewer("", palette = "Dark2",
+                        labels=c("FALSE"="Twist mut",
+                                 "TRUE"="Twist wt")) +
+      scale_x_log10("log10 counts of sequenced oligos")+
+      scale_y_continuous(expand = c(0,0)) +
+      geom_vline(xintercept = median(nr.reads.per.variant), col = "black", linetype="dashed") +
+      ggtitle(gsub("_", " ", i)) +
+      theme_light(base_size = 15)
+    
+    print(gg)
+  }
+  
+  print(i)
+}
+
+dev.off()
+
+```
+
+```{r How consistent are the missing oligos between inputs, replicates?}
+
+Oligo_library_metadata <- read.delim("Drosophila_oligo_library_Oligo_counts.txt")
+
+# barplot of oligos with 0 counts in x, y or xy
+library(gridExtra)
+plot_list_tmp <- list()
+for(id in 1:4){
+  if(id==1){
+    a="input_dev_rep1_UMI"
+    b="input_dev_rep2_UMI"
+    main="dev input replicates"
+  }
+  if(id==2){
+    a="input_hk_rep1_UMI"
+    b="input_hk_rep2_UMI"
+    main="hk input replicates"
+  }
+  if(id==3){
+    a="input_dev_rep1_UMI"
+    b="input_hk_rep1_UMI"
+    main="dev & hk inputs rep1"
+  }
+  if(id==4){
+    a="input_dev_rep2_UMI"
+    b="input_hk_rep2_UMI"
+    main="dev & hk inputs rep2"
+  }
+  
+  t <- table(Oligo_library_metadata[,a]>0,
+             Oligo_library_metadata[,b]>0)
+  
+  df <- as.data.frame(t)[-4,]
+  df$ID <- c("Both",
+             gsub("_", " ", substr(a, 1, nchar(a)-4)),
+             gsub("_", " ", substr(b, 1, nchar(b)-4)))
+  df$ID <- factor(df$ID, levels=c(gsub("_", " ", substr(a, 1, nchar(a)-4)),
+                                  gsub("_", " ", substr(b, 1, nchar(b)-4)),
+                                  "Both"))
+  
+  p<-ggplot(data=df, aes(x=ID, y=Freq, fill=ID)) +
+    geom_bar(stat="identity", width=0.7) +
+    scale_y_continuous("# missing oligos (out of 58k)", breaks = seq(0,1000,100)) +
+    xlab("Sample") +
+    guides(fill=F) +
+    scale_fill_manual(values=c("grey70", "grey70", "grey30")) +
+    ggtitle(main) +
+    theme_bw(base_size = 11) +
+    theme(plot.title = element_text(hjust = 0.5),
+          axis.text.x = element_text(size = 11),
+          axis.text.y = element_text(size = 10),
+          axis.title.x= element_text(margin = margin(t = 7, r = 0, b = 0, l = 0)),
+          axis.title = element_text(size = 15))
+  
+  plot_list_tmp[[id]] = ggplotGrob(p)
+  
+}
+
+# multiplot
+pdf("Drosophila_oligo_library_Consistency_of_missing_oligos_between_inputs_replicates.pdf",
+    width = 9.5, height = 10)
+print(gridExtra::grid.arrange(grobs = plot_list_tmp, ncol = 2))
+dev.off()
+
+```
+
+### Check UMI collapsing rate
+
+```{r Compare UMI counts with all reads}
+
+plot_list_a = list()
+for(i in experiment_table$simple_name){
+  
+  a <- paste0(i,"_UMI")
+  b <- paste0(i,"_all")
+  
+  p <- ggplot(data = Oligo_library_metadata, aes_string(Oligo_library_metadata[,a], Oligo_library_metadata[,b])) + 
+    geom_abline(intercept = 0) +
+    geom_point(size = 0.5) +
+    guides(alpha="none", fill="none")+
+    xlab(gsub("_", " ", a)) +
+    ylab(gsub("_", " ", b)) +
+    ggtitle(gsub("_", " ", i)) +
+    theme_bw()
+  
+  plot_list_a[[i]] = p
+  
+}
+
+pdf("Drosophila_oligo_library_Collapsing_UMI_vs_all_reads.pdf", width = 12, height = 12)
+cowplot::plot_grid(plotlist = plot_list_a, ncol = 3)
+dev.off()
+
+```
+
+### Compare replicates
+
+```{r Compare replicates}
+
+library(ggpointdensity)
+
+Oligo_library_metadata <- read.delim("Drosophila_oligo_library_Oligo_counts.txt")
+
+pdf(paste0("Drosophila_oligo_library_Replicate_correlations.pdf"), width = 15, height = 4.5)
+
+for(f in c("UMI")){
+  
+  plot_list_tmp = list()
+  
+  if(f=="UMI") Oligo_counts <- Oligo_library_metadata[,grep("rep._UMI", names(Oligo_library_metadata))]
+  if(f=="all") Oligo_counts <- Oligo_library_metadata[,grep("rep._all", names(Oligo_library_metadata))]
+  
+  # normalise to 1 million mapped fragments
+  Counts_per_million_cpm <- as.data.frame(apply(Oligo_counts, 2, function(x) x/sum(x)*1e6))
+  
+  for(id in c("input_dev_rep", "STARRseq_dev_rep", "input_hk_rep", "STARRseq_hk_rep")){
+    if(id=="STARRseq_dev_rep") t="Dev STARR-seq"
+    if(id=="STARRseq_hk_rep") t="Hk STARR-seq"
+    if(id=="input_dev_rep") t="Dev input"
+    if(id=="input_hk_rep") t="Hk input"
+    
+    df_tmp <- Counts_per_million_cpm[,grep(id, names(Counts_per_million_cpm))]
+    
+    comparison_list <- list(a_b=c(names(Counts_per_million_cpm)[grep(id, names(Counts_per_million_cpm))[1]],
+                                  names(Counts_per_million_cpm)[grep(id, names(Counts_per_million_cpm))[2]]),
+                            a_c=c(names(Counts_per_million_cpm)[grep(id, names(Counts_per_million_cpm))[1]],
+                                  names(Counts_per_million_cpm)[grep(id, names(Counts_per_million_cpm))[3]]),
+                            b_c=c(names(Counts_per_million_cpm)[grep(id, names(Counts_per_million_cpm))[2]],
+                                  names(Counts_per_million_cpm)[grep(id, names(Counts_per_million_cpm))[3]]))
+    
+    if(length(grep(id, names(Counts_per_million_cpm)))==4) comparison_list[["a_d"]] <- c(names(Counts_per_million_cpm)[grep(id, names(Counts_per_million_cpm))[1]],
+                                                                                       names(Counts_per_million_cpm)[grep(id, names(Counts_per_million_cpm))[4]])
+    
+    plot_list_tmp <- lapply(comparison_list, function(x){
+      
+      a <- x[1]
+      b <- x[2]
+      
+      # PCC
+      pc <- cor.test(log10(df_tmp[apply(df_tmp,1,min)>0,a]),
+                     log10(df_tmp[apply(df_tmp,1,min)>0,b]),
+                     method = "pearson")
+      
+      if(length(grep("dev", id))>0) my_col=c("orangered","orangered4") else{my_col=c("dodgerblue","dodgerblue4")}
+      
+      # plot
+      scater <- ggplot(df_tmp, aes(df_tmp[,a], df_tmp[,b])) +
+        geom_pointdensity(adjust = 0.4, size=0.4) +
+        scale_color_gradient(low = my_col[1], high = my_col[2]) +
+        scale_x_log10(gsub("_", " ", a),
+                      limits=c(min(df_tmp[df_tmp!=0], na.rm=T), max(df_tmp, na.rm=T)),
+                      breaks=c(0,1,10,100,1000, 10000)) +
+        scale_y_log10(gsub("_", " ", b),
+                      limits=c(min(df_tmp[df_tmp!=0], na.rm=T), max(df_tmp, na.rm=T)),
+                      breaks=c(0,1,10,100,1000, 10000)) +
+        guides(color=F) +
+        theme_bw(base_size = 16) +
+        theme(panel.grid = element_blank(),
+              axis.text = element_text(colour="black"),
+              plot.title = element_text(hjust=0.5),
+              plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
+        annotate("text",  x=min(df_tmp[df_tmp!=0], na.rm=T), y = max(df_tmp, na.rm=T), label = paste0("PCC: ", round(pc$estimate,2)), vjust=1, hjust=0, size=5)
+      
+      return(ggplotGrob(scater))
+      
+    })
+    
+  # multiplot
+  print(gridExtra::grid.arrange(grobs = plot_list_tmp, nrow = 1))
+  
+  }
+
+}
+
+dev.off()
+
+```
+
+### Calculate activity of each oligo with DESeq2
+
+```{r Twist oligo fold-change to input with DESeq2}
+
+Count_table <- read.delim("Drosophila_oligo_library_Oligo_counts.txt")
+Count_table <- Count_table[,c(1:13,grep("UMI", names(Count_table)))]
+rownames(Count_table) <- Count_table$Oligo_ID
+
+
+# http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html
+library(DESeq2)
+Count_table_final <- Count_table
+for(e in c("dev", "hk")){
+  
+  # only sequences with at least 10 reads in all inputs
+  Count_table_2 <- Count_table[rowSums(Count_table[,grep(paste0("input_", e), names(Count_table))]<10)==0,]
+  
+  cts <- Count_table_2[,grep(e, names(Count_table_2), ignore.case = T)]
+  rownames(cts) <- Count_table_2$Oligo_ID
+  
+  # added one read pseudocount to oligos with zero RNA counts
+  cts[cts==0] <- 1
+  
+  # design
+  coldata <- data.frame(type=factor(rep(c("Input", "Experiment"),each=3),levels=c("Input", "Experiment")),
+                        row.names = names(cts))
+  
+  if (!identical(which(coldata$type=="Input"), grep("input", rownames(coldata)))){
+    print("Input in design matrix does not match input samples")
+    break
+  }
+  if (!all(rownames(coldata) %in% colnames(cts))){
+    print("Rownames do not match colnames")
+    break
+  }
+  if (!all(rownames(coldata) == colnames(cts))){
+    print("Rownames do not match colnames")
+    break
+  }
+  
+  dds <- DESeqDataSetFromMatrix(countData = as.matrix(cts),
+                                colData = coldata,
+                                design= ~ type)
+  
+  # counts of wildtype negative regions in each library as scaling factors between samples
+  sizeFactors(dds)=estimateSizeFactorsForMatrix(as.matrix(cts[grep("_wt_NegativeRegions", rownames(cts)),]))
+  dds <- DESeq(dds)
+  #resultsNames(dds) # lists the coefficients
+  
+  pdf(paste0("Drosophila_oligo_library_Twist_oligo_FC_DESeq2_",e,".pdf"))
+  
+  # plots quality control
+  plotDispEsts(dds)
+  
+  # plot normal FC
+  res <- results(dds, alpha=0.05)
+  summary(res)
+  DESeq2::plotMA(res)
+  mcols(res)$description
+  
+  boxplot(res$log2FoldChange~Count_table_2$Enhancer_type)
+  abline(h=0)
+  
+  # plot merged RNA vs merged DNA
+  # this gives log2(n + 1)
+  ntd <- as.data.frame(assay(normTransform(dds)))
+  ntd$input_mean <- rowMeans(ntd[,c(1,2)])
+  ntd$experiment_mean <- rowMeans(ntd[,c(3,4)])
+  plot(ntd$input_mean, ntd$experiment_mean, col=c("black", "red")[factor(res$padj<0.05)])
+  abline(0,1)
+  
+  dev.off()
+  
+  # merge with main table
+  tmp <- as.data.frame(res)[,c(1,2,5,6)]
+  names(tmp) <- paste0(e,"_",names(tmp))
+  Count_table_final <- merge(Count_table_final, tmp, by.x=1, by.y=0, all.x=T)
+  
+  print(e)
+}
+
+write.table(Count_table_final, "Drosophila_oligo_library_final_table_all_oligos.txt", sep="\t", quote=F, row.names = F)
+
+# remove oligos with no activity in both dev and hk screens
+Count_table_final <- Count_table_final[!(!complete.cases(Count_table_final$dev_log2FoldChange) & !complete.cases(Count_table_final$hk_log2FoldChange)),]
+
+write.table(Count_table_final, "Drosophila_oligo_library_final_table.txt", sep="\t", quote=F, row.names = F)
+
+```

@@ -1,0 +1,319 @@
+#!/bin/bash
+
+###############################################
+## bsub
+## mimics bsub of the LSF system for the SGE
+## WARNING: options are different
+##
+###############################################
+
+#TODO - add message and email parameter in case job dies/exit unexpectedly, i.e. not enough memory problem
+
+#update 21/06/2018
+#now we have two environment - one using gridengine submission system and another - slurm
+#and they are running diffferent OS - Debian vs CentOS.
+#this how I will get where I am...
+
+#update 2019/06/17 in the new cluster (clip) this command does not work any more.
+#OS_id=`lsb_release -idrc|grep Description|perl -ne 'chomp($_); ($name)=$_=~/\:\s+(\S+)\s+/; print $name."\n";'`
+
+#update 2019/06/17
+# Instead Seren Uemit has recommended to use  $LMOD_SYSHOST system variable
+# So, for the moment I have 'CLIP' , 'IMPIMBA-2', or '' (empty for old cluster, including nodes stark-1 stark-2) values
+OS_id=$(echo $LMOD_SYSHOST)
+
+#Debian and old cluster specific defaults
+#if [ "$OS_id" == "Debian" ]; then ## commad was for lsb_release
+if [ "$OS_id" == "" ]; then 
+  # update 6.07.18 It is not safe to load this module multiple times (when script is running from loops for example.),
+  # so its better to load this module separately, only once, before run any command
+  # module load gridengine/2011.11
+   QUEUE=public.q
+# centOS and new cluster specific defaults
+#else
+
+fi
+
+## defaults
+SHELL=/bin/bash #/bin/sh does not inherit environment, use /bin/bash!
+QUEUE2=
+LOG=/dev/null
+ERRORLOG=/dev/null
+TMPDIR=/tmp/
+SYNC=no
+HELP=0
+MEMORY=0
+SPACE=0
+NAME=
+DEPENDS=
+HOSTS=""
+CORES=""
+NODES=""
+ARRAY=0
+RESTRICT=0
+EMAIL=""
+TIME=
+
+## parse command line parameters
+while getopts s:q:p:o:e:m:n:t:d:H:A:R:C:K:h:M:N:T: o
+do case "$o" in
+      s)        SHELL="$OPTARG";;
+      q)        QUEUE="$OPTARG";;
+      o)        LOG="$OPTARG"; TMPDIR="$OPTARG";;
+      e)        ERRORLOG="$OPTARG";;
+      m)        MEMORY="$OPTARG";;
+      n)        NAME="$OPTARG";;
+      t)        SPACE="$OPTARG";;
+      d)        DEPENDS="$OPTARG";;
+      C)        CORES="$OPTARG";;
+      N)        NODES="$OPTARG";;
+      H)        HOSTS="$OPTARG";;
+      A)        ARRAY="$OPTARG";;
+      R)        RESTRICT="$OPTARG";;
+      K)        SYNC=yes;;
+      h)        HELP=1;;
+      M)        EMAIL="$OPTARG";;
+      T)        TIME="$OPTARG";;
+      [?])      echo >&2 "ERROR: command line parameter not recognized."; HELP=1;;
+      esac
+done
+
+shift $(($OPTIND-1))
+
+if [ $HELP -eq 1 ]; then
+	echo >&2 "USAGE: $0 [OPTIONS]
+-n  name of the job [optional]
+-s	shell [default: $SHELL]
+-q	queue (for gridengine only) [default: $QUEUE]
+-o	stdout directory, also the directory where the script for submission by qsub will be written [default: $LOG]
+-e	stderr directory [default: $ERRORLOG]
+-m	memory requirements in gigabites (0 for off) [default: $MEMORY]
+-t	tmp-space requirements in Gigabites (0 for off) [default: $SPACE]
+-C	number of cpus (cores) per task required on host (number (2) or range (2-6)) [default: off]
+-N  number of nodes per tasks (number). For those software that allows cross talks between nodes.
+    Note, that total number of CPUs will be calculated as N*C. For slurm only [default: off]
+-H	use only indicated hosts (e.g. \"compute-3-*\" or \"compute-3-*|compute-4-*\") [default: off]
+-A	this is an array job with N tasks numbered 1-N and accessible by \$SGE_TASK_ID(<2 for off) [optional]
+-R	restrict array job such that no more than R jobs run in parallel (0 for off) [default: $RESTRICT]
+-K	wait for the job to complete [optional]
+-d  name of the dependent job [optional]
+-M  email to get internal log information about job finishing
+-T  add time parameter, for slurm in the format hh:mm:ss Example 2 days:'2-00:00:00' [default: $TIME]
+-h	print this help
+"
+	exit 1
+fi
+
+
+## set ERRORLOG to LOG if not defined otherwise
+if [ $ERRORLOG = "/dev/null" ]; then
+    ERRORLOG=$LOG
+fi
+
+## test output directories
+if [ $LOG != "/dev/null" ]; then
+    if [ ! -e $LOG ]; then
+        mkdir -p $LOG
+    else
+        if [ ! -d $LOG ]; then
+            echo >&2 "ERROR: $LOG exists but is not a directory"
+            exit 0
+        fi
+    fi
+fi
+
+if [ $ERRORLOG != "/dev/null" ]; then
+    if [ ! -e $ERRORLOG ]; then
+        mkdir -p $ERRORLOG
+    else
+        if [ ! -d $ERRORLOG ]; then
+            echo >&2 "ERROR: $ERRORLOG exists but is not a directory"
+            exit 0
+        fi
+    fi
+fi
+
+## get unique save temp file
+TMPFILE=$(mktemp -p $TMPDIR)
+
+## write header to temp file
+if [ "$OS_id" == "Debian" ]; then
+  echo "#!/bin/sh" >> $TMPFILE
+  echo "#$ -S $SHELL" >> $TMPFILE
+  echo "#$ -q $QUEUE" >> $TMPFILE
+  if [ ! -z "$QUEUE2" ]; then
+	   echo "#$ -q $QUEUE2" >> $TMPFILE
+  fi
+  echo "#$ -cwd" >> $TMPFILE
+
+   ## add job name if set
+   if [ ! -z "$NAME" ]; then
+     echo "#$ -N $NAME" >> $TMPFILE
+   fi
+
+   ## add memory requirements if set
+   if [ $MEMORY != 0 ]; then
+     echo "#$ -l vf=${MEMORY}G" >> $TMPFILE
+   fi
+
+   ## add tmp-space requirements if set
+   if [ $SPACE != 0 ]; then
+     echo "#$ -l tf=${SPACE}G" >> $TMPFILE
+   fi
+
+   ## add numbers of cores if set
+   if [[ -n $CORES ]]; then
+     echo "#$ -pe smp ${CORES}" >> $TMPFILE
+   fi
+
+   ## add host requirements if set
+   if [[ -n $HOSTS ]]; then
+      echo "#$ -l hostname=\"${HOSTS}\"" >> $TMPFILE
+    fi
+
+    ## add info about array job
+    if [ $ARRAY -gt 1 ]; then
+      echo "#$ -t 1-${ARRAY}" >> $TMPFILE
+    fi
+
+    ## add info about array job restriction
+    if [ $RESTRICT -gt 0 ]; then
+      echo "#$ -tc ${RESTRICT}" >> $TMPFILE
+    fi
+
+    if [ ! -z "$DEPENDS" ]; then
+      echo "#$ -hold_jid ${DEPENDS}" >> $TMPFILE
+    fi
+
+    if [ ! -z "$TIME" ]; then
+      echo "#$ -l walltime=${TIME}" >> $TMPFILE
+    fi
+
+#send email at the end of the job, this includes abort
+    if [ ! -z "$EMAIL" ]; then
+      echo "#$ -M $EMAIL" >> $TMPFILE
+      echo "#$ -m e" >> $TMPFILE
+    fi
+
+    ## write command to temp file (stdin or rest of command line)
+    if [ $# -eq 0 ]; then
+      cat >> $TMPFILE
+    else
+      echo $@ >> $TMPFILE
+    fi
+
+    ## add submit command as comment
+    echo -e "\n# submit-command is: qsub -sync $SYNC -e $ERRORLOG -o $LOG $TMPFILE" >> $TMPFILE
+
+    ## submit
+    qsub -sync $SYNC -e $ERRORLOG -o $LOG $TMPFILE
+
+  else #for slurm submission system syntax is different
+    currDir=`pwd`
+    echo "#!/usr/bin/env bash" >> $TMPFILE
+    echo "#SBATCH --chdir $currDir" >> $TMPFILE
+    # echo "#SBATCH --nodes=1" >> $TMPFILE
+    # echo "#SBATCH --ntasks=1" >> $TMPFILE
+    # echo "#SBATCH --cpus-per-task=1" >> $TMPFILE
+    # echo "#SBATCH --mem-per-cpu=1G" >> $TMPFILE
+
+  #  echo "#SBATCH -p $QUEUE" >> $TMPFILE
+    ## add job name if set
+    if [ ! -z "$NAME" ]; then
+      echo "#SBATCH --job-name $NAME" >> $TMPFILE
+    fi
+
+    ## add memory requirements if set
+    if [ $MEMORY != 0 ]; then
+      echo "#SBATCH --mem=${MEMORY}G" >> $TMPFILE
+    fi
+
+    ## add tmp-space requirements if set -- dont need it in the slurm system, the resources are unlimited
+  #  if [ $SPACE != 0 ]; then
+  #    echo "#SBATCH --gres tf=${SPACE}G" >> $TMPFILE
+  #  fi
+
+    ## add numbers of cores if set
+
+    if [[ -n $CORES ]]; then
+      echo "#SBATCH --cpus-per-task=${CORES}" >> $TMPFILE
+    fi
+
+    if [[ -n $NODES ]]; then
+      echo "#SBATCH --nodes=${NODES}" >> $TMPFILE
+    fi
+
+    ## add host requirements if set
+    if [[ -n $HOSTS ]]; then
+      echo "#SBATCH --nodelist=\"${HOSTS}\"" >> $TMPFILE
+    fi
+
+     ## add info about array job
+     if [ $ARRAY -gt 1 ]; then
+       addArray=""
+       if [ $RESTRICT -gt 0 ]; then
+         addArray="%${RESTRICT}"
+       fi
+       echo "#SBATCH --array=1-${ARRAY}${addArray}" >> $TMPFILE
+     fi
+
+     if [ ! -z "$DEPENDS" ]; then
+       echo "#SBATCH --dependency=afterok:${DEPENDS}" >> $TMPFILE
+     fi
+
+     if [ ! -z "$TIME" ]; then
+       echo "#SBATCH --time=${TIME}" >> $TMPFILE
+       #after 4h we need medium queue, system does not resolve it automatically
+       queueID=$(echo $TIME |perl -ne 'chomp($_); @d=split(":",$_); if($d[0]=~/(\d+)\-(\d+)/){
+        $days=$1;
+        $hours=$2;
+        $hours=~s/^0//;
+        $h=$days*24+$hours;
+       }else{
+         $h=$d[0];
+         $h=~s/^0//;
+       }
+       $qId="short";
+       if($h>48){
+         $qId='long';
+       }elsif($h>4){
+         $qId="medium";
+       }
+       print $qId;
+       ')
+       if [ "$queueID" != "short" ]; then
+         echo "#SBATCH --qos=$queueID" >> $TMPFILE
+       fi
+     fi
+
+     #send email at the end of the job, this includes abort
+      if [ ! -z "$EMAIL" ]; then
+           echo "#SBATCH --mail-user=$EMAIL" >> $TMPFILE
+           echo "#SBATCH --mail-type=FAIL" >> $TMPFILE
+     fi
+
+    # wait for a job to finish
+    if [ "$SYNC" == "yes" ]; then
+        echo "#SBATCH --wait" >> $TMPFILE
+    fi
+
+     ## write command to temp file (stdin or rest of command line)
+     if [ $# -eq 0 ]; then
+       cat >> $TMPFILE
+     else
+       echo $@ >> $TMPFILE
+     fi
+
+     ## add submit command as comment
+     echo -e "\n# submit-command is: sbatch  -e ${TMPFILE}.err -o ${TMPFILE}.out $TMPFILE" >> $TMPFILE
+
+    ## submit
+    echo "sbatch  -e ${TMPFILE}.err -o ${TMPFILE}.out $TMPFILE"
+    sbatch  -e ${TMPFILE}.err -o ${TMPFILE}.out $TMPFILE
+
+  fi #slurm
+
+## remove tmpfile for submission (if in /tmp/ otherwise keep)
+if [ $TMPDIR = "/tmp/" ]; then
+    rm $TMPFILE
+fi
