@@ -1,6 +1,6 @@
 # Scripts for processing genome-wide UMI-STARR-seq data
 
-Main script: UMISTARRseq_pipeline.sh
+Main script: [UMISTARRseq_pipeline.sh](UMISTARRseq_pipeline.sh)
 
 Steps:
 - Map reads with bowtie and collapse by UMIs
