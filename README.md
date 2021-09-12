@@ -34,10 +34,11 @@ Data used to train and evaluate the DeepSTARR model as well as the final trained
 
 ## UMI-STARR-seq with designed oligo libraries to test more than 40,000 wildtype and mutant Drosophila and human enhancers
 
-You can find the code [here](Oligo_UMISTARRseq).
+We designed and synthetised (in oligo pools by Twist Bioscience) wildtype and TF motif-mutant sequences of Drosophila and human enhancers. The activity of each sequence was assessed experimentally by **UMI-STARR-seq** in *Drosophila melanogaster* S2 (both developmental and housekeeping UMI-STARR-seq; see figure below) and human HCT-116 cells, respectively.
 
+<img src="img/oligo_UMISTARRseq_enh_mutants.png" width="900" style="margin-bottom:0;margin-top:0;"/>
 
-
+You can find the code to analyse *Drosophila* and human UMI-STARR-seq screens [here](Oligo_UMISTARRseq).
 
 ## UCSC Genome Browser tracks
 Genome browser tracks showing genome-wide UMI-STARR-seq and DeepSTARR predictions in Drosophila, together with the enhancers used for mutagenesis, mutated motif instances and respective log2 fold-changes, are available at https://genome.ucsc.edu/s/bernardo.almeida/DeepSTARR_manuscript.
