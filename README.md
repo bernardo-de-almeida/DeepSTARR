@@ -16,13 +16,16 @@ You can find the code to process the data [here](GenomeWide_UMISTARRseq).
 
 ## DeepSTARR model
 
+DeepSTARR is a multi-task convolutional neural network that maps 249 bp long DNA sequences to both their developmental and their housekeeping enhancer activities. We adapted the Basset convolutional neural network architecture ([Kelley et al., 2016](https://github.com/davek44/Basset)) and designed DeepSTARR with four convolution layers, each followed by a max-pooling layer, and two fully connected layers. The convolution layers identify local sequence features (e.g. TF motifs) and increasingly complex patterns (e.g. TF motif syntax), while the fully connected layers combine these features and patterns to predict enhancer activity separately for each enhancer type.
+
 
 <p float="left" style="margin-bottom:0;margin-top:0;">
     <img height="200" src="img/DeepSTARR.png">
     <img height="200" src="img/DeepSTARR_predictions.png">
 </p>
 
-You can find the code [here](DeepSTARR).
+You can find the code used to train and interpret DeepSTARR [here](DeepSTARR).
+Data used to train and evaluate the DeepSTARR model as well as the final trained model are available on zenodo at https://doi.org/10.5281/zenodo.5502060.
 
 ### Predict developmental and housekeeping activity of new DNA sequences
 
