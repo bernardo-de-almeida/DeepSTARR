@@ -19,24 +19,21 @@ You can find the code to process the data [here](GenomeWide_UMISTARRseq).
 
 **DeepSTARR** is a multi-task convolutional neural network that maps 249 bp long DNA sequences to both their developmental and their housekeeping enhancer activities. We adapted the Basset convolutional neural network architecture ([Kelley et al., 2016](https://github.com/davek44/Basset)) and designed DeepSTARR with four convolution layers, each followed by a max-pooling layer, and two fully connected layers. The convolution layers identify local sequence features (e.g. TF motifs) and increasingly complex patterns (e.g. TF motif syntax), while the fully connected layers combine these features and patterns to predict enhancer activity separately for each enhancer type.
 
-
 <p float="left" style="margin-bottom:0;margin-top:0;">
     <img height="200" src="img/DeepSTARR.png">
     <img height="200" src="img/DeepSTARR_predictions.png">
 </p>
 
-You can find the code used to train and interpret DeepSTARR [here](DeepSTARR).  
+You can find the code used to train DeepSTARR and compute nucleotide contribution scores [here](DeepSTARR).  
 Data used to train and evaluate the DeepSTARR model as well as the final trained model are available on zenodo at https://doi.org/10.5281/zenodo.5502060.
 
 ### Predict developmental and housekeeping enhancer activity of new DNA sequences
-
-To predict the developmental and housekeeping enhancer activity in *Drosophila melanogaster* S2 cells for new DNA sequences, please run:
+To predict the developmental and housekeeping enhancer activity in *Drosophila melanogaster* S2 cells for new DNA sequences, please download the trained DeepSTARR model from [zenodo](https://doi.org/10.5281/zenodo.5502060) and run:
 ```
-python DeepSTARR_predict.py '<enhancer_type>' '<FASTA_file>'
+python DeepSTARR_pred_new_sequence.py -s Sequences_example.fa -m DeepSTARR.model
 ```
 Where:
-* <enhancer_type>: Enhancer type (developmental or housekeeping) for which activity should be predicted
-* <FASTA_file>: FASTA file with input DNA sequences
+* -s FASTA file with input DNA sequences
 
 ## UMI-STARR-seq with designed oligo libraries to test more than 40,000 wildtype and mutant Drosophila and human enhancers
 
