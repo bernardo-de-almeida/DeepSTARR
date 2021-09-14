@@ -6,4 +6,4 @@ R markdowns for processing mapped reads, check quality of screens, replicates, a
 - Drosophila library: [Drosophila_oligo_library_processing.Rmd](Drosophila_oligo_library_processing.Rmd)
 - Human library: [Human_oligo_library_processing.Rmd](Human_oligo_library_processing.Rmd)
 
-The raw sequencing and processed data are available from GEO under accession number GSE183939](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE183939).
+The raw sequencing and processed data are available from GEO under accession number [GSE183939](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE183939).

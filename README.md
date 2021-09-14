@@ -5,14 +5,14 @@ For more information, see the DeepSTARR manuscript:
 *DeepSTARR predicts enhancer activity from DNA sequence and enables the de novo design of enhancers*. bioRxiv (2021)  
 Bernardo P. de Almeida, Franziska Reiter, Michaela Pagani, Alexander Stark
 
-This repository contains the code used to process genome-wide and oligo UMI-STARR-seq and train DeepSTARR.
+This repository contains the code used to process genome-wide and oligo UMI-STARR-seq data and train DeepSTARR.
 
 ## Genome-wide enhancer activity maps of developmental and housekeeping enhancers
 We used **UMI-STARR-seq** ([Arnold et al., 2013](http://www.sciencemag.org/lookup/doi/10.1126/science.1232542); [Neumayr et al., 2019](https://doi.org/10.1002/cpmb.105)) to generate genome-wide high resolution, quantitative activity maps of developmental and housekeeping enhancers, representing the two main transcriptional programs in *Drosophila* S2 cells ([Arnold et al., 2017](http://dx.doi.org/doi:10.1038/nbt.3739); [Haberle et al., 2019](https://doi.org/10.1038/s41586-019-1210-7); [Zabidi et al., 2015](http://dx.doi.org/10.1038/nature13994)).
 
 <img src="img/gw_UMISTARRseq.png" width="700" style="margin-bottom:0;margin-top:0;"/>
 
-The raw sequencing data are available from GEO under accession number [GSE183939](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE183939).  
+The raw sequencing data are available from GEO under accession number [GSE183939](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE183936).  
 You can find the code to process the data [here](GenomeWide_UMISTARRseq).
 
 ## DeepSTARR model
@@ -41,10 +41,11 @@ We designed and synthetised (in oligo pools by [Twist Bioscience](https://www.tw
 
 <img src="img/oligo_UMISTARRseq_enh_mutants.png" width="900" style="margin-bottom:0;margin-top:0;"/>
 
+The raw sequencing data are available from GEO under accession number [GSE183939](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE183939).  
 You can find the code to analyse *Drosophila* and human oligo UMI-STARR-seq screens [here](Oligo_UMISTARRseq).
 
 ## UCSC Genome Browser tracks
-Genome browser tracks showing genome-wide UMI-STARR-seq and DeepSTARR predictions in *Drosophila*, together with the enhancers used for mutagenesis, mutated motif instances and respective log2 fold-changes, are available at https://genome.ucsc.edu/s/bernardo.almeida/DeepSTARR_manuscript.
+Genome browser tracks showing genome-wide UMI-STARR-seq and DeepSTARR predictions in *Drosophila*, together with the enhancers used for mutagenesis, mutated motif instances and respective log2 fold-changes in enhancer activity, are available at https://genome.ucsc.edu/s/bernardo.almeida/DeepSTARR_manuscript.
 
 ## Questions
 If you have any questions/requests/comments please contact me at [bernardo.almeida94@gmail.com](mailto:bernardo.almeida94@gmail.com).
