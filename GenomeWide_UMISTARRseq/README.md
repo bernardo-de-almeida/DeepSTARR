@@ -8,5 +8,5 @@ Steps:
 - Create coverage BigWig files
 - Call STARR-seq peaks
 
-The raw sequencing and processed data are available from GEO under accession number [GSE183939](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE183939).
+The raw sequencing and processed data are available from GEO under accession number [GSE183939](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE183939).  
 Genome browser tracks are available at https://genome.ucsc.edu/s/bernardo.almeida/DeepSTARR_manuscript.
