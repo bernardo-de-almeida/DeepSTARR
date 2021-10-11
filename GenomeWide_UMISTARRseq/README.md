@@ -10,3 +10,6 @@ Steps:
 
 The raw sequencing and processed data are available from GEO under accession number [GSE183939](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE183939).  
 Genome browser tracks are available at https://genome.ucsc.edu/s/bernardo.almeida/DeepSTARR_manuscript.
+
+## Questions
+If you have any questions/requests/comments please contact me at [bernardo.almeida94@gmail.com](mailto:bernardo.almeida94@gmail.com).

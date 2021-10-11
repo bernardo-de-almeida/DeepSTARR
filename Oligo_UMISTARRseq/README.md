@@ -7,3 +7,6 @@ R markdowns for processing mapped reads, check quality of screens, replicates, a
 - Human library: [Human_oligo_library_processing.Rmd](Human_oligo_library_processing.Rmd)
 
 The raw sequencing and processed data are available from GEO under accession number [GSE183939](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE183939).
+
+## Questions
+If you have any questions/requests/comments please contact me at [bernardo.almeida94@gmail.com](mailto:bernardo.almeida94@gmail.com).

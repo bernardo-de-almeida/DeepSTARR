@@ -39,3 +39,9 @@ python DeepSTARR_nucl_contr_scores.py -m DeepSTARR.model -s Sequences_example.fa
 Where:
 * -s FASTA file with input DNA sequences
 * -c Enhancer type for which contribution scores should be derived
+
+#### Note
+Neural_Network_DNA_Demo forked from https://github.com/const-ae/Neural_Network_DNA_Demo
+
+## Questions
+If you have any questions/requests/comments please contact me at [bernardo.almeida94@gmail.com](mailto:bernardo.almeida94@gmail.com).
