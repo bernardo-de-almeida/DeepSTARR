@@ -1,8 +1,8 @@
 # DeepSTARR
 **DeepSTARR** is a deep learning model built to quantitatively predict the activities of developmental and housekeeping enhancers from DNA sequence in *Drosophila melanogaster* S2 cells.
 
-For more information, see the DeepSTARR manuscript:  
-*<ins>DeepSTARR predicts enhancer activity from DNA sequence and enables the de novo design of enhancers</ins>*.  
+For more information, see the DeepSTARR manuscript on bioRxiv:  
+[*<ins>DeepSTARR predicts enhancer activity from DNA sequence and enables the de novo design of enhancers</ins>*](https://www.biorxiv.org/content/10.1101/2021.10.05.463203)  
 Bernardo P. de Almeida, Franziska Reiter, Michaela Pagani, Alexander Stark
 
 This repository contains the code used to process genome-wide and oligo UMI-STARR-seq data and train DeepSTARR.
@@ -37,7 +37,7 @@ Where:
 
 ## UMI-STARR-seq with designed oligo libraries to test more than 40,000 wildtype and mutant Drosophila and human enhancers
 
-We designed and synthetised (in oligo pools by [Twist Bioscience](https://www.twistbioscience.com/resources/product-sheet/twist-oligo-pools)) wildtype and TF motif-mutant sequences of Drosophila and human enhancers. The activity of each sequence in the oligo libraries was assessed experimentally by **UMI-STARR-seq** in *Drosophila melanogaster* S2 (both developmental and housekeeping UMI-STARR-seq; see figure below) and human HCT116 cells, respectively.
+We designed and synthesised (in oligo pools by [Twist Bioscience](https://www.twistbioscience.com/resources/product-sheet/twist-oligo-pools)) wildtype and TF motif-mutant sequences of Drosophila and human enhancers. The activity of each sequence in the oligo libraries was assessed experimentally by **UMI-STARR-seq** in *Drosophila melanogaster* S2 (both developmental and housekeeping UMI-STARR-seq; see figure below) and human HCT116 cells, respectively.
 
 <img src="img/oligo_UMISTARRseq_enh_mutants.png" width="900" style="margin-bottom:0;margin-top:0;"/>
 
