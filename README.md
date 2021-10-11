@@ -30,6 +30,17 @@ Data used to train and evaluate the DeepSTARR model as well as the final trained
 ### Predict developmental and housekeeping enhancer activity of new DNA sequences
 To predict the developmental and housekeeping enhancer activity in *Drosophila melanogaster* S2 cells for new DNA sequences, please download the trained DeepSTARR model from [zenodo](https://doi.org/10.5281/zenodo.5502060) and run:
 ```
+# Clone this repository
+git clone git@github.com:bernardo-de-almeida/DeepSTARR.git
+cd DeepSTARR
+
+# create 'DeepSTARR' conda environment
+conda env create -f DeepSTARR_conda_env.yml
+
+# Activate the conda environment
+source activate DeepSTARR
+
+# Run prediction script
 python DeepSTARR_pred_new_sequence.py -s Sequences_example.fa -m DeepSTARR.model
 ```
 Where:
