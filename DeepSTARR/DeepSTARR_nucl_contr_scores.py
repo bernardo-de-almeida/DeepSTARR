@@ -55,7 +55,7 @@ def seq_to_one_hot_fill_in_array(zeros_array, sequence, one_hot_axis):
     assert one_hot_axis==0 or one_hot_axis==1
     if (one_hot_axis==0):
         assert zeros_array.shape[1] == len(sequence)
-    elif (one_hot_axis==1): 
+    elif (one_hot_axis==1):
         assert zeros_array.shape[0] == len(sequence)
     #will mutate zeros_array
     for (i,char) in enumerate(sequence):
@@ -88,10 +88,10 @@ def prepare_input(file_seq):
     seq_matrix_A = SequenceHelper.do_one_hot_encoding(input_fasta_data_A.sequence, sequence_length,
       SequenceHelper.parse_alpha_to_seq)
     print(seq_matrix_A.shape)
-    
+
     X = np.nan_to_num(seq_matrix_A) # Replace NaN with zero and infinity with large finite numbers
     X_reshaped = X.reshape((X.shape[0], X.shape[1], X.shape[2]))
-    
+
     print(file_seq)
 
     return X_reshaped
@@ -125,7 +125,7 @@ def combine_mult_and_diffref(mult, orig_inp, bg_data):
     assert len(orig_inp[0].shape)==2
     #At each position in the input sequence, we iterate over the one-hot encoding
     # possibilities (eg: for genomic sequence, this is ACGT i.e.
-    # 1000, 0100, 0010 and 0001) and compute the hypothetical 
+    # 1000, 0100, 0010 and 0001) and compute the hypothetical
     # difference-from-reference in each case. We then multiply the hypothetical
     # differences-from-reference with the multipliers to get the hypothetical contributions.
     #For each of the one-hot encoding possibilities,
@@ -142,14 +142,14 @@ def combine_mult_and_diffref(mult, orig_inp, bg_data):
         hypothetical_input[:,i] = 1.0
         hypothetical_difference_from_reference = (hypothetical_input[None,:,:]-bg_data[0])
         hypothetical_contribs = hypothetical_difference_from_reference*mult[0]
-        projected_hypothetical_contribs[:,:,i] = np.sum(hypothetical_contribs,axis=-1) 
+        projected_hypothetical_contribs[:,:,i] = np.sum(hypothetical_contribs,axis=-1)
     return [np.mean(projected_hypothetical_contribs,axis=0)]
 
 
 def my_deepExplainer(model, one_hot, class_output):
     import shap # forked from https://github.com/AvantiShri/shap/blob/master/shap/explainers/deep/deep_tf.py
     import numpy as np
-    
+
     # output layer
     if class_output=="dev":
         out_layer=-2
@@ -159,10 +159,10 @@ def my_deepExplainer(model, one_hot, class_output):
     explainer = shap.DeepExplainer((model.layers[0].input, model.layers[out_layer].output),
         data=dinuc_shuffle_several_times,
         combine_mult_and_diffref=combine_mult_and_diffref)
-        
+
     # running on all sequences
     shap_values_hypothetical = explainer.shap_values(one_hot)
-    
+
     # normalising contribution scores
     # sum the deeplift importance scores across the ACGT axis (different nucleotides at the same position)
     # and “project” that summed importance onto whichever base is actually present at that position
@@ -195,11 +195,11 @@ f = h5py.File(sequence_set+"_"+model_ID_out+"_"+class_output+"_contribution_scor
 g = f.create_group("contrib_scores")
 # save the actual contribution scores
 g.create_dataset(class_output, data=scores[1])
-print("Done for " + class_output)
+print("Done contr scores for " + class_output)
 
 g = f.create_group("hyp_contrib_scores")
 # save the hypothetical contribution scores
 g.create_dataset(class_output, data=scores[0])
-print("Done for " + class_output)
+print("Done hyp scores for " + class_output)
 
 f.close()
