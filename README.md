@@ -28,17 +28,20 @@ You can find the code used to train DeepSTARR and compute nucleotide contributio
 Data used to train and evaluate the DeepSTARR model as well as the final trained model are available on zenodo at https://doi.org/10.5281/zenodo.5502060.
 
 ### Predict developmental and housekeeping enhancer activity of new DNA sequences
-To predict the developmental and housekeeping enhancer activity in *Drosophila melanogaster* S2 cells for new DNA sequences, please download the trained DeepSTARR model from [zenodo](https://doi.org/10.5281/zenodo.5502060) and run:
+To predict the developmental and housekeeping enhancer activity in *Drosophila melanogaster* S2 cells for new DNA sequences, please run:
 ```
 # Clone this repository
-git clone git@github.com:bernardo-de-almeida/DeepSTARR.git
-cd DeepSTARR
+git clone https://github.com/bernardo-de-almeida/DeepSTARR.git
+cd DeepSTARR/DeepSTARR
 
-# create 'DeepSTARR' conda environment
-conda env create -f DeepSTARR_conda_env.yml
+# download the trained DeepSTARR model from zenodo (https://doi.org/10.5281/zenodo.5502060)
 
-# Activate the conda environment
+# create 'DeepSTARR' conda environment by running the following:
+conda create --name DeepSTARR python=3.7 tensorflow=1.14.0 keras=2.2.4
 source activate DeepSTARR
+pip install git+git://github.com/AvantiShri/shap.git@master
+pip install 'h5py<3.0.0'
+pip install deeplift==0.6.13.0
 
 # Run prediction script
 python DeepSTARR_pred_new_sequence.py -s Sequences_example.fa -m DeepSTARR.model
