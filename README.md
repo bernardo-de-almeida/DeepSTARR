@@ -37,7 +37,7 @@ cd DeepSTARR/DeepSTARR
 # download the trained DeepSTARR model from zenodo (https://doi.org/10.5281/zenodo.5502060)
 
 # create 'DeepSTARR' conda environment by running the following:
-conda create --name DeepSTARR python=3.7 tensorflow=1.14.0 keras=2.2.4
+conda create --name DeepSTARR python=3.7 tensorflow=1.14.0 keras=2.2.4 # or tensorflow-gpu/keras-gpu if you are using a GPU
 source activate DeepSTARR
 pip install git+git://github.com/AvantiShri/shap.git@master
 pip install 'h5py<3.0.0'
