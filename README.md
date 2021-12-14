@@ -3,7 +3,7 @@
 
 For more information, see the DeepSTARR manuscript on bioRxiv:  
 [*<ins>DeepSTARR predicts enhancer activity from DNA sequence and enables the de novo design of enhancers</ins>*](https://www.biorxiv.org/content/10.1101/2021.10.05.463203)  
-Bernardo P. de Almeida, Franziska Reiter, Michaela Pagani, Alexander Stark
+Bernardo P. de Almeida, Franziska Reiter, Michaela Pagani, Alexander Stark  
 [Presentation at ISCB Webinar](https://www.youtube.com/watch?v=vg32mqptMdQ)
 
 This repository contains the code used to process genome-wide and oligo UMI-STARR-seq data and train DeepSTARR.
