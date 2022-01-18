@@ -26,7 +26,8 @@ You can find the code to process the data [here](GenomeWide_UMISTARRseq).
 </p>
 
 You can find the code used to train DeepSTARR and compute nucleotide contribution scores [here](DeepSTARR).  
-Data used to train and evaluate the DeepSTARR model as well as the final trained model are available on zenodo at https://doi.org/10.5281/zenodo.5502060.
+Data used to train and evaluate the DeepSTARR model as well as the final trained model are available on zenodo at https://doi.org/10.5281/zenodo.5502060.  
+DeepSTARR is also deposited in [Kipoi](http://kipoi.org/models/DeepSTARR/).
 
 ### Predict developmental and housekeeping enhancer activity of new DNA sequences
 To predict the developmental and housekeeping enhancer activity in *Drosophila melanogaster* S2 cells for new DNA sequences, please run:
