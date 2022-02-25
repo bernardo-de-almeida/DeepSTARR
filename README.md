@@ -61,7 +61,7 @@ The raw sequencing data are available from GEO under accession number [GSE183939
 You can find the code to analyse *Drosophila* and human oligo UMI-STARR-seq screens [here](Oligo_UMISTARRseq).
 
 ## Code for Figures
-Code to reproduce the figures can be found [here](Figures), and the respective data [here](https://data.starklab.org/almeida/DeepSTARR/Figures_data/).
+Code to reproduce the figures can be found [here](Figures) and the respective processed data [here](https://data.starklab.org/almeida/DeepSTARR/Figures_data/).
 
 ## UCSC Genome Browser tracks
 Genome browser tracks showing genome-wide UMI-STARR-seq and DeepSTARR predictions in *Drosophila*, including nucleotide contribution scores for all enhancer sequences, together with the enhancers used for mutagenesis, mutated motif instances and respective log2 fold-changes in enhancer activity, are available at https://genome.ucsc.edu/s/bernardo.almeida/DeepSTARR_manuscript.  
