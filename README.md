@@ -25,9 +25,9 @@ You can find the code to process the data [here](GenomeWide_UMISTARRseq).
     <img height="200" src="img/DeepSTARR_predictions.png">
 </p>
 
-You can find the code used to train DeepSTARR and compute nucleotide contribution scores [here](DeepSTARR).  
+You can find the code used to train DeepSTARR and compute nucleotide contribution scores [here](DeepSTARR).    
 Data used to train and evaluate the DeepSTARR model as well as the final trained model are available on zenodo at https://doi.org/10.5281/zenodo.5502060.  
-DeepSTARR is also deposited in [Kipoi](http://kipoi.org/models/DeepSTARR/).
+DeepSTARR is also deposited in [Kipoi](http://kipoi.org/models/DeepSTARR/).  
 
 ### Predict developmental and housekeeping enhancer activity of new DNA sequences
 To predict the developmental and housekeeping enhancer activity in *Drosophila melanogaster* S2 cells for new DNA sequences, please run:
@@ -59,6 +59,9 @@ We designed and synthesised (in oligo pools by [Twist Bioscience](https://www.tw
 
 The raw sequencing data are available from GEO under accession number [GSE183939](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE183939).  
 You can find the code to analyse *Drosophila* and human oligo UMI-STARR-seq screens [here](Oligo_UMISTARRseq).
+
+## Code for Figures
+Code to reproduce the figures can be found [here](Figures), and the respective data [here](https://data.starklab.org/almeida/DeepSTARR/Figures_data/).
 
 ## UCSC Genome Browser tracks
 Genome browser tracks showing genome-wide UMI-STARR-seq and DeepSTARR predictions in *Drosophila*, including nucleotide contribution scores for all enhancer sequences, together with the enhancers used for mutagenesis, mutated motif instances and respective log2 fold-changes in enhancer activity, are available at https://genome.ucsc.edu/s/bernardo.almeida/DeepSTARR_manuscript.  
