@@ -1,9 +1,9 @@
 # DeepSTARR
 **DeepSTARR** is a deep learning model built to quantitatively predict the activities of developmental and housekeeping enhancers from DNA sequence in *Drosophila melanogaster* S2 cells.
 
-For more information, see the DeepSTARR manuscript on bioRxiv:  
-[*<ins>DeepSTARR predicts enhancer activity from DNA sequence and enables the de novo design of enhancers</ins>*](https://www.biorxiv.org/content/10.1101/2021.10.05.463203)  
-Bernardo P. de Almeida, Franziska Reiter, Michaela Pagani, Alexander Stark  
+For more information, see the DeepSTARR publication:  
+[*<ins>DeepSTARR predicts enhancer activity from DNA sequence and enables the de novo design of enhancers</ins>*](https://www.nature.com/articles/s41588-022-01048-5)  
+Bernardo P. de Almeida, Franziska Reiter, Michaela Pagani, Alexander Stark. Nature Genetics, 2022.  
 [Presentation at ISCB Webinar](https://www.youtube.com/watch?v=vg32mqptMdQ)
 
 This repository contains the code used to process genome-wide and oligo UMI-STARR-seq data and train DeepSTARR.
