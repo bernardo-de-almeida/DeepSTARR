@@ -2,7 +2,7 @@
 **DeepSTARR** is a deep learning model built to quantitatively predict the activities of developmental and housekeeping enhancers from DNA sequence in *Drosophila melanogaster* S2 cells.
 
 For more information, see the DeepSTARR publication:  
-[*<ins>DeepSTARR predicts enhancer activity from DNA sequence and enables the de novo design of enhancers</ins>*](https://www.nature.com/articles/s41588-022-01048-5)  
+[*<ins>DeepSTARR predicts enhancer activity from DNA sequence and enables the de novo design of synthetic enhancers</ins>*](https://www.nature.com/articles/s41588-022-01048-5)  
 Bernardo P. de Almeida, Franziska Reiter, Michaela Pagani, Alexander Stark. Nature Genetics, 2022.  
 [Presentation at ISCB Webinar](https://www.youtube.com/watch?v=vg32mqptMdQ)
 
