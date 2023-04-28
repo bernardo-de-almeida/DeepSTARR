@@ -29,6 +29,9 @@ You can find the code used to train DeepSTARR and compute nucleotide contributio
 Data used to train and evaluate the DeepSTARR model as well as the final trained model are available on zenodo at https://doi.org/10.5281/zenodo.5502060.  
 DeepSTARR is also deposited in [Kipoi](http://kipoi.org/models/DeepSTARR/).  
 
+### Tutorial
+An end-to-end example to train DeepSTARR, compute the nucleotide contribution scores and modisco TF motifs is contained in the following colab notebook: https://colab.research.google.com/drive/1Xgak40TuxWWLh5P5ARf0-4Xo0BcRn0Gd. You can run this notebook yourself to experiment with DeepSTARR.
+
 ### Predict developmental and housekeeping enhancer activity of new DNA sequences
 To predict the developmental and housekeeping enhancer activity in *Drosophila melanogaster* S2 cells for new DNA sequences, please run:
 ```
